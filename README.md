@@ -1,2 +1,2 @@
 # learn_git
-teach kid git
+teach kids git
