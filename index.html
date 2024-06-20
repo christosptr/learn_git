@@ -1,0 +1,109 @@
+
+
+<html lang="en">
+
+
+<head>
+  <title>aria-errormessage examples</title>
+  <style>
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
+    </style>
+  <script>
+
+      var result1 = 0;
+      var result2 = 0;
+
+      function update1() {
+          result1 = result1 + 1;
+          document.getElementById("result3").innerHTML = "Assertive " + result1;
+          document.getElementById("result3").setAttribute("aria-live", "assertive");
+
+          document.getElementById("result1").setAttribute("role", "alert");
+          document.getElementById("result1.1").innerHTML = "This is an error";
+          document.getElementById("result1.2").innerHTML = result1;
+
+          document.getElementById("result2").innerHTML = "Polite " + result1;
+          document.getElementById("result2").setAttribute("aria-live", "polite");
+
+      }
+
+
+      function update2() {
+          document.getElementById("result6").innerHTML = "Assertive no update";
+          document.getElementById("result6").setAttribute("aria-live", "assertive");
+
+          document.getElementById("result4").innerHTML = " ";
+          setTimeout("Hithere",2000);
+          document.getElementById("result4").innerHTML = "Alert no update";
+          document.getElementById("result4").setAttribute("role", "alert");
+          document.getElementById("result5").innerHTML = "Polite no update";
+          document.getElementById("result5").setAttribute("aria-live", "polite");
+
+      }
+  </script>
+
+</head>
+
+<body>
+  <main role="main">
+
+<div disabled><a href="#" disabled>test</a> </div>
+
+<h1>aria-errormessage</h1>
+
+<p>The aria-errormessage attribute takes an ID reference in the same manner as aria-describedby, and is only exposed when aria-invalid is set to ‘true’ on the same element. The use of a live region attribute such as aria-live=”polite” on the error message container element is optional
+</p>
+<p>https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-errormessage
+</p>
+
+<label for="fname">First name</label>
+
+<input id="fname"
+aria-errormessage="errorID"
+aria-invalid="true"
+aria-describedby="errorID1"></input>
+
+<div id="errorID">Error: You require a value.</div>
+
+<div id="infoID">The format of this field.</div>
+
+
+- WCAG name is what a user will use to interact with an element For example Dragon Naturally speaking
+<label></label> Is the strongers WCAG
+- Tags vs Attributes
+- aria-label
+<div></div>
+<span></span>
+<button></button>
+
+
+<h2 id="davidBio"> David's Bio</h2>
+<button aria-describedby="davidBio">Read more</button>
+
+<h2 id="chrisdBio"> Chris' Bio</h2>
+<button aria-describedby="chrisdBio">Read more</button><br>
+
+
+<label for="lastNameID">Last name</label>
+<input id="lastNameID" aria-invalid="true" aria-errormessage="errorMessageID" type="text"><br>
+<div name="erromessage" id="errorMessageID">Please make sure you enter your Last Name</div>
+
+
+<div role="heading" aria-level="1">This is an aria heading level 1</div>
+<h1>This is a heading real level 1 </h1>
+</main>
+
+</body>
+
+
+
+</html>
