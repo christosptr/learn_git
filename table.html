@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Table</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .action-bar {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+        }
+        .description {
+            display: none;
+            padding: 8px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            margin-top: 5px;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 12px;
+            display: none;
+        }
+        .selected-row {
+            background-color: #e0f7fa;
+        }
+        :focus {
+            outline: 2px dashed black;
+            outline-offset: 0.2rem;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Transaction Table</h1>
+    <!-- Table container with tooltip for instructions -->
+    <div tabindex="0" id="tableContainer" aria-describedby="tooltip">
+        <div id="tooltip" class="tooltip">Press Enter to activate the table, Tab to move to checkboxes, Right Arrow to select the row</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Transaction</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="checkbox" class="transaction-checkbox" data-amount="100" tabindex="-1">
+                        <div id="tooltip" class="tooltip">Use Right Arrow to select the row</div></td>
+                    <td tabindex="-1" class="transaction-row" aria-expanded="false" aria-controls="desc1">Transaction 1</td>
+                    <td>$100</td>
+                </tr>
+                <tr id="desc1" class="description">
+                    <td colspan="3">Description for Transaction 1 <input type="text"></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" class="transaction-checkbox" data-amount="200" tabindex="-1"></td>
+                    <td tabindex="-1" class="transaction-row" aria-expanded="false" aria-controls="desc2">Transaction 2</td>
+                    <td>$200</td>
+                </tr>
+                <tr id="desc2" class="description">
+                    <td colspan="3">Description for Transaction 2 <input type="text"></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" class="transaction-checkbox" data-amount="300" tabindex="-1"></td>
+                    <td tabindex="-1" class="transaction-row" aria-expanded="false" aria-controls="desc3">Transaction 3</td>
+                    <td>$300</td>
+                </tr>
+                <tr id="desc3" class="description">
+                    <td colspan="3">Description for Transaction 3 <input type="text"></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" class="transaction-checkbox" data-amount="400" tabindex="-1"></td>
+                    <td tabindex="-1" class="transaction-row" aria-expanded="false" aria-controls="desc4">Transaction 4</td>
+                    <td>$400</td>
+                </tr>
+                <tr id="desc4" class="description">
+                    <td colspan="3">Description for Transaction 4 <input type="text"></td>
+                </tr>
+                <!-- Add more rows as needed -->
+            </tbody>
+        </table>
+    </div>
+    <!-- Action bar for total amount and buttons -->
+    <div class="action-bar" id="actionBar">
+        <p>Total Selected Amount: $<span id="totalAmount">0</span> <button id="clearCancelBtn">Clear and Cancel</button> <button id="editBtn">Edit</button></p>
+    </div>
+
+    <!-- Back button for navigation -->
+    <button onclick="window.location.href='TransactionTable.html'">Back</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tableContainer = document.getElementById('tableContainer');
+            const checkboxes = document.querySelectorAll('.transaction-checkbox');
+            const actionBar = document.getElementById('actionBar');
+            const totalAmount = document.getElementById('totalAmount');
+            const rows = document.querySelectorAll('.transaction-row');
+            const descriptions = document.querySelectorAll('.description');
+            const tooltip = document.getElementById('tooltip');
+            const clearCancelBtn = document.getElementById('clearCancelBtn');
+            const editBtn = document.getElementById('editBtn');
+
+            // Show tooltip when the table container is focused
+            tableContainer.addEventListener('focus', function() {
+                tooltip.style.display = 'block';
+            });
+
+            // Hide tooltip when the table container loses focus
+            tableContainer.addEventListener('blur', function() {
+                tooltip.style.display = 'none';
+            });
+
+            // Activate table and set focus to the first checkbox when Enter is pressed
+            tableContainer.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    checkboxes.forEach(checkbox => {
+                        checkbox.setAttribute('tabindex', '0');
+                    });
+                    checkboxes[0].focus();
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            checkboxes.forEach((checkbox, index) => {
+                // Navigate between checkboxes and prevent default behavior for Enter key
+                checkbox.addEventListener('keydown', function(e) {
+                    if (e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        checkbox.parentElement.nextElementSibling.focus();
+                    } else if (e.key === 'Tab' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (index < checkboxes.length - 1) {
+                            checkboxes[index + 1].focus();
+                        } else {
+                            checkboxes[0].focus();
+                        }
+                    } else if (e.key === 'Tab' && e.shiftKey) {
+                        e.preventDefault();
+                        if (index > 0) {
+                            checkboxes[index - 1].focus();
+                        } else {
+                            checkboxes[checkboxes.length - 1].focus();
+                        }
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault(); // Prevent Enter key from doing anything and keep focus on the same checkbox
+                        checkbox.focus();
+                    }
+                });
+
+                // Update total amount when a checkbox is checked/unchecked
+                checkbox.addEventListener('change', function() {
+                    updateTotalAmount();
+                });
+            });
+
+            rows.forEach(row => {
+                // Handle row expansion and focus management
+                row.addEventListener('keydown', function (e) {
+                    const desc = document.getElementById(row.getAttribute('aria-controls'));
+                    if (e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        desc.querySelector('input').focus(); // Move focus to the description input field
+                    } else if (e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        row.focus(); // Move focus back to the row
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const isExpanded = row.getAttribute('aria-expanded') === 'true';
+                        row.setAttribute('aria-expanded', !isExpanded);
+                        desc.style.display = isExpanded ? 'none' : 'table-row';
+                        row.focus(); // Keep focus on the row
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        row.classList.remove('selected-row');
+                        row.setAttribute('aria-expanded', 'false');
+                        desc.style.display = 'none';
+                        checkboxes.forEach(checkbox => {
+                            checkbox.setAttribute('tabindex', '-1');
+                        });
+                        tableContainer.focus();
+                    }
+                });
+            });
+            // Function to update the total selected amount and show/hide the action bar
+            function updateTotalAmount() {
+                let total = 0;
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        total += parseFloat(checkbox.dataset.amount);
+                    }
+                });
+                totalAmount.textContent = total.toFixed(2);
+                actionBar.style.display = total > 0 ? 'block' : 'none';
+            }
+
+            // Clear selection and reset focus when Clear and Cancel button is clicked
+            clearCancelBtn.addEventListener('click', function() {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                updateTotalAmount();
+                tableContainer.focus();
+            });
+
+            // Placeholder action for Edit button
+            editBtn.addEventListener('click', function() {
+                alert('Edit action');
+            });
+
+            // Set all checkboxes to tabindex -1 and refocus on table container when Escape is pressed
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    checkboxes.forEach(checkbox => {
+                        checkbox.setAttribute('tabindex', '-1');
+                    });
+                    tableContainer.focus();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
