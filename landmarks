@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landmark Navigation</title>
+  <style>
+    /* Styling for focus outline */
+    :focus {
+      outline: 2px dashed black;
+      outline-offset: 0.2rem;
+    }
+
+    /* Styling for tooltip */
+    .tooltip {
+      position: absolute;
+      background-color: #333;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 3px;
+      font-size: 14px;
+      display: none;
+      z-index: 10;
+      transform: translateY(-100%);
+      margin-bottom: 5px;
+      white-space: nowrap;
+    }
+
+    /* Styling for header */
+    header {
+      position: relative;
+    }
+
+    /* Styling for main content */
+    main {
+      position: relative;
+      display: inline-block;
+      width: 70%;
+      vertical-align: top;
+    }
+
+    /* Styling for navigation */
+    nav {
+      position: relative;
+      display: inline-block;
+      width: 25%;
+      vertical-align: top;
+    }
+
+    /* Styling for footer columns */
+    .footer-columns {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Styling for individual footer column */
+    .footer-column {
+      flex-basis: 30%;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header section -->
+  <header role="banner" tabindex="0">
+    <h1>banner</h1>
+    <img tabindex="-1" src="./sample_logo.jpeg" alt="Sample logo">
+    <button tabindex="-1">Search</button>
+    <div class="tooltip">Press Enter to activate section or Esc to move back</div>
+  </header>
+
+  <!-- Navigation section -->
+  <nav role="navigation" tabindex="0">
+    <h1 id="nav2">navigation</h1>
+    <ul>
+      <li><a href="#" tabindex="-1">Link 1</a></li>
+      <li><a href="#" tabindex="-1">Link 2</a></li>
+      <li><a href="#" tabindex="-1">Link 3</a></li>
+      <li><a href="#" tabindex="-1">Link 4</a></li>
+    </ul>
+    <div class="tooltip">Press Enter to activate section or Esc to move back</div>
+  </nav>
+
+  <!-- Main content section -->
+  <main role="main" tabindex="0">
+    <div class="tooltip">Press Enter to activate section or Esc to move back</div>
+    <h1>main</h1>
+    <ul>
+      <li><a href="#" tabindex="-1">Link 5</a></li>
+      <li><a href="#" tabindex="-1">Link 6</a></li>
+      <li><a href="#" tabindex="-1">Link 7</a></li>
+      <li><a href="#" tabindex="-1">Link 8</a></li>
+    </ul>
+  </main>
+
+  <!-- Footer section -->
+  <footer role="contentinfo" tabindex="0">
+    <div class="tooltip">Press Enter to activate section or Esc to move back</div>
+    <h1>footer</h1>
+    <div class="footer-columns">
+      <div class="footer-column">
+        <h2>Column 1</h2>
+        <ul>
+          <li><a href="#" tabindex="-1">Link 9</a></li>
+          <li><a href="#" tabindex="-1">Link 10</a></li>
+          <li><a href="#" tabindex="-1">Link 11</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h2>Column 2</h2>
+        <ul>
+          <li><a href="#" tabindex="-1">Link 12</a></li>
+          <li><a href="#" tabindex="-1">Link 13</a></li>
+          <li><a href="#" tabindex="-1">Link 14</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h2>Column 3</h2>
+        <ul>
+          <li><a href="#" tabindex="-1">Link 15</a></li>
+          <li><a href="#" tabindex="-1">Link 16</a></li>
+          <li><a href="#" tabindex="-1">Link 17</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const landmarks = document.querySelectorAll('[role="banner"], [role="main"], [role="navigation"], [role="contentinfo"]');
+
+      landmarks.forEach(landmark => {
+        const tooltip = landmark.querySelector('.tooltip');
+
+        // Show tooltip when landmark receives focus
+        landmark.addEventListener('focus', function () {
+          if (tooltip) {
+            tooltip.style.display = 'block';
+          }
+        });
+
+        // Hide tooltip when landmark loses focus
+        landmark.addEventListener('blur', function () {
+          if (tooltip) {
+            tooltip.style.display = 'none';
+          }
+        });
+
+        // Handle keyboard navigation within landmarks
+        landmark.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const focusableElements = landmark.querySelectorAll('a, img, button, input, select, textarea, [tabindex="0"]');
+            focusableElements.forEach(el => el.setAttribute('tabindex', '0'));
+            const logo = landmark.querySelector('img');
+            if (logo) {
+              logo.focus();
+            } else {
+              focusableElements[0]?.focus();
+            }
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            const focusableElements = landmark.querySelectorAll('a, button, input, select, textarea, [tabindex="0"]');
+            focusableElements.forEach(el => el.setAttribute('tabindex', '-1'));
+            landmark.focus();
+          }
+        });
+
+        // Set initial tabindex and handle Escape key within focusable elements
+        const focusableElements = landmark.querySelectorAll('a, button, input, select, textarea, [tabindex="0"]');
+        focusableElements.forEach(el => {
+          el.setAttribute('tabindex', '-1');
+          el.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              focusableElements.forEach(el => el.setAttribute('tabindex', '-1'));
+              landmark.focus();
+            }
+          });
+        });
+      });
+    });
+  </script>
+
+
+</body>
+
+</html>
