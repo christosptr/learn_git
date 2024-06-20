@@ -1,109 +1,121 @@
-
-
+<!DOCTYPE html>
 <html lang="en">
 
-
 <head>
-  <title>aria-errormessage examples</title>
-  <style>
-      .sr-only {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        border: 0;
-      }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Button Styling</title>
+    <style>
+        .custom-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #000000;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            position: relative;
+            outline: none;
+            transition: all 0s;
+        }
+
+        .custom-button::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background-color: #226BFC;
+            visibility: hidden;
+            transition: visibility 0s;
+        }
+
+        .custom-button[aria-pressed="true"]::after {
+            visibility: visible;
+        }
+
+        .custom-button:focus,
+        .custom-button:hover {
+            outline: 3px dashed #000000;
+            outline-offset: 4px;
+        }
+
+        .status-message {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #000000;
+        }
     </style>
-  <script>
-
-      var result1 = 0;
-      var result2 = 0;
-
-      function update1() {
-          result1 = result1 + 1;
-          document.getElementById("result3").innerHTML = "Assertive " + result1;
-          document.getElementById("result3").setAttribute("aria-live", "assertive");
-
-          document.getElementById("result1").setAttribute("role", "alert");
-          document.getElementById("result1.1").innerHTML = "This is an error";
-          document.getElementById("result1.2").innerHTML = result1;
-
-          document.getElementById("result2").innerHTML = "Polite " + result1;
-          document.getElementById("result2").setAttribute("aria-live", "polite");
-
-      }
-
-
-      function update2() {
-          document.getElementById("result6").innerHTML = "Assertive no update";
-          document.getElementById("result6").setAttribute("aria-live", "assertive");
-
-          document.getElementById("result4").innerHTML = " ";
-          setTimeout("Hithere",2000);
-          document.getElementById("result4").innerHTML = "Alert no update";
-          document.getElementById("result4").setAttribute("role", "alert");
-          document.getElementById("result5").innerHTML = "Polite no update";
-          document.getElementById("result5").setAttribute("aria-live", "polite");
-
-      }
-  </script>
-
 </head>
 
 <body>
-  <main role="main">
+<h1>Keyboard focus and aria-pressed attribute</h1>
+<div>
+    <button class="custom-button" aria-pressed="false" id="button1">Button 1</button>
+    <div class="status-message" id="status1"></div>
+    <br /><br />
 
-<div disabled><a href="#" disabled>test</a> </div>
+    <button class="custom-button" aria-pressed="false" id="button2">Button 2</button>
+    <div class="status-message" id="status2"></div>
+    <br /><br />
 
-<h1>aria-errormessage</h1>
+    <button class="custom-button" aria-pressed="false" id="button3">Button 3</button>
+    <div class="status-message" id="status3"></div>
+    <br /><br />
 
-<p>The aria-errormessage attribute takes an ID reference in the same manner as aria-describedby, and is only exposed when aria-invalid is set to ‘true’ on the same element. The use of a live region attribute such as aria-live=”polite” on the error message container element is optional
-</p>
-<p>https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-errormessage
-</p>
+    <button class="custom-button" aria-pressed="false" id="button4">Button 4</button>
+    <div class="status-message" id="status4"></div>
+    <br /><br />
+</div>
 
-<label for="fname">First name</label>
+<button onclick="clearStatus()">Reset</button>
+<button id="toggleDebugButton" onclick="toggleDebugMode()">Debug Mode: Off</button>
 
-<input id="fname"
-aria-errormessage="errorID"
-aria-invalid="true"
-aria-describedby="errorID1"></input>
+<script>
+    let debugMode = false;
 
-<div id="errorID">Error: You require a value.</div>
+    document.querySelectorAll('.custom-button').forEach((button) => {
+        button.addEventListener('click', function () {
+            const isPressed = this.getAttribute('aria-pressed') === 'true';
+            this.setAttribute('aria-pressed', !isPressed);
+            const statusId = 'status' + this.id.slice(-1);
+            if (!debugMode) {
+                setTimeout(function () {
+                    document.getElementById(statusId).innerText = "Aria-pressed: " + !isPressed;
+                }, 1); //1000 milliseconds = 1 second
+            }
+        });
+    });
 
-<div id="infoID">The format of this field.</div>
+    function clearStatus() {
+        document.querySelectorAll('.custom-button').forEach(button => {
+            button.setAttribute('aria-pressed', 'false');
+            const statusId = 'status' + button.id.slice(-1);
+            document.getElementById(statusId).innerText = 'aria-pressed: false';
+        });
 
+        document.querySelectorAll('.status-message').forEach(status => {
+            status.innerText = "";
+        });
+    }
 
-- WCAG name is what a user will use to interact with an element For example Dragon Naturally speaking
-<label></label> Is the strongers WCAG
-- Tags vs Attributes
-- aria-label
-<div></div>
-<span></span>
-<button></button>
-
-
-<h2 id="davidBio"> David's Bio</h2>
-<button aria-describedby="davidBio">Read more</button>
-
-<h2 id="chrisdBio"> Chris' Bio</h2>
-<button aria-describedby="chrisdBio">Read more</button><br>
-
-
-<label for="lastNameID">Last name</label>
-<input id="lastNameID" aria-invalid="true" aria-errormessage="errorMessageID" type="text"><br>
-<div name="erromessage" id="errorMessageID">Please make sure you enter your Last Name</div>
-
-
-<div role="heading" aria-level="1">This is an aria heading level 1</div>
-<h1>This is a heading real level 1 </h1>
-</main>
-
+    function toggleDebugMode() {
+        debugMode = !debugMode;
+        const debugButton = document.getElementById('toggleDebugButton');
+        if (debugMode) {
+            document.querySelectorAll('.status-message').forEach(status => {
+                status.innerText = "";
+            });
+            debugButton.innerText = 'Debug Mode: Off';
+        } else {
+            document.querySelectorAll('.custom-button').forEach(button => {
+                const statusId = 'status' + button.id.slice(-1);
+                document.getElementById(statusId).innerText = "aria-pressed: " + button.getAttribute('aria-pressed');
+            });
+            debugButton.innerText = 'Debug Mode: On';
+        }
+    }
+</script>
 </body>
-
-
 
 </html>
